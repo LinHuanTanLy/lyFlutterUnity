@@ -11,6 +11,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+
     }
 }
 
@@ -23,7 +25,6 @@ allprojects {
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-
 android {
     compileSdkVersion 31
 
@@ -43,4 +44,8 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+    dependencies{
+        implementation group: 'com.unity3d.ads', name: 'unity-ads', version: '4.4.1'
+    }
+
 }
