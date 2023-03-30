@@ -11,7 +11,27 @@ class MethodChannelLyUnityAd extends LyUnityAdPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
+  }
+
+  @override
+  void setCallBack(Future Function(MethodCall call)? handler) {
+    methodChannel.setMethodCallHandler(handler);
+  }
+
+  @override
+  Future<String?> init(String gameId, bool ifTestModel) async {
+    final result = await methodChannel.invokeMethod<String>(
+        'init', {"gameId": gameId, "ifTestModel": ifTestModel});
+    return result;
+  }
+
+  @override
+  Future<String?> showInterstitialAd(adUnitId, gamerSid) async {
+    final result = await methodChannel.invokeMethod<String>(
+        'showInterstitialAd', {"adUnitId": adUnitId, "gamerSid": gamerSid});
+    return result;
   }
 }

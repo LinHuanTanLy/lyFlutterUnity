@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'ly_unity_ad_method_channel.dart';
@@ -23,7 +24,19 @@ abstract class LyUnityAdPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  void setCallBack(Future<dynamic> Function(MethodCall call)? handler){
+    throw UnimplementedError('setCallBack() has not been implemented.');
+
+  }
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<String?> init(String gameId, bool ifTestModel) {
+    throw UnimplementedError('init() has not been implemented.');
+  }
+
+  Future<String?> showInterstitialAd(adUnitId,gamerSid) {
+    throw UnimplementedError('showInterstitialAd() has not been implemented.');
   }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:ly_unity_ad/ly_unity_ad.dart';
+import 'package:ly_unity_ad_example/conf.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,6 +24,16 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initPlatformState();
+    initCallback();
+  }
+
+  void initCallback() {
+    _lyUnityAdPlugin.setCallBack((call) {
+      switch (call.method) {
+
+      }
+      return Future.value(true);
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -31,8 +42,8 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     // We also handle the message potentially returning null.
     try {
-      platformVersion =
-          await _lyUnityAdPlugin.getPlatformVersion() ?? 'Unknown platform version';
+      platformVersion = await _lyUnityAdPlugin.getPlatformVersion() ??
+          'Unknown platform version';
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -54,8 +65,26 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          children: [
+            Text('Running on: $_platformVersion\n'),
+            MaterialButton(
+              onPressed: () {
+                _lyUnityAdPlugin
+                    .init(Conf.androidId, true)
+                    .then((value) => debugPrint(value));
+              },
+              child: const Text("init"),
+            ),
+            MaterialButton(
+              onPressed: () {
+                _lyUnityAdPlugin
+                    .showInterstitialAd("lyTest", "ly0001")
+                    .then((value) => debugPrint('ly say: $value'));
+              },
+              child: const Text("showInterstitialAd"),
+            ),
+          ],
         ),
       ),
     );

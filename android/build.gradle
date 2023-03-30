@@ -43,4 +43,8 @@ android {
     defaultConfig {
         minSdkVersion 16
     }
+
+    dependencies{
+        implementation 'com.unity3d.ads:unity-ads:4.5.0'
+    }
 }
