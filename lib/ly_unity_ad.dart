@@ -1,25 +1,4 @@
-import 'package:flutter/services.dart';
+library ly_unity_ad;
 
-import 'ly_unity_ad_platform_interface.dart';
-
-class LyUnityAd {
-  void setCallBack(Future Function(MethodCall call)? handler) {
-    return LyUnityAdPlatform.instance.setCallBack(handler);
-  }
-
-  Future<String?> getPlatformVersion() {
-    return LyUnityAdPlatform.instance.getPlatformVersion();
-  }
-
-  Future<String?> init(String gameId, bool ifTestModel) {
-    return LyUnityAdPlatform.instance.init(gameId, ifTestModel);
-  }
-
-  Future<String?> showInterstitialAd(String adUnitId, String gamerSid) {
-    return LyUnityAdPlatform.instance.showInterstitialAd(adUnitId, gamerSid);
-  }
-
-  Future<String?> showRewardedAd(adUnitId, gamerSid) async {
-    return LyUnityAdPlatform.instance.showRewardedAd(adUnitId, gamerSid);
-  }
-}
+export 'package:ly_unity_ad/src/unity_ad.dart';
+export 'package:ly_unity_ad/src/widget/ly_banner_ad.dart';

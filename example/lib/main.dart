@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:ly_unity_ad/ly_unity_ad.dart';
 import 'package:ly_unity_ad_example/conf.dart';
-
+import 'package:ly_unity_ad/ly_unity_ad.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -100,6 +99,16 @@ class _MyAppState extends State<MyApp> {
               },
               child: const Text("showRewardedAd"),
             ),
+            MaterialButton(
+              onPressed: () {
+                _lyUnityAdPlugin
+                    .showRewardedAd("lyRewardAd", "ly0001")
+                    .then((value) => debugPrint('ly say: $value'));
+              },
+              child: const Text("lyTestBanner"),
+            ),
+            SizedBox(width: 100,height: 100,  child: const LyBannerAdWidget())
+
           ],
         ),
       ),

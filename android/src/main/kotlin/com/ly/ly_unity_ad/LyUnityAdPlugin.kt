@@ -4,26 +4,35 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
+import com.ly.ly_unity_ad.widget.LyBannerAdViewFactory
 import com.unity3d.ads.*
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-
-import io.flutter.embedding.engine.plugins.activity.ActivityAware
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 /** LyUnityAdPlugin */
 class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var channel: MethodChannel
     private lateinit var context: Context
     private lateinit var activity: Activity
+
+
+    private lateinit var lyBannerAdViewFactory: LyBannerAdViewFactory
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ly_unity_ad")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
+        lyBannerAdViewFactory = LyBannerAdViewFactory(flutterPluginBinding.binaryMessenger)
+
+        flutterPluginBinding.platformViewRegistry.registerViewFactory(
+                "ly_Android_banner",
+                lyBannerAdViewFactory
+            )
+
     }
 
 
@@ -33,6 +42,7 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "init" -> init(call, result)
             "showInterstitialAd" -> showAds(call, result, false)
             "showRewardedAd" -> showAds(call, result, true)
+            "showBannerAd" -> showShowBannerAd(call, result)
         }
 
 
@@ -42,6 +52,13 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
      * 展示插页式广告
      */
     private fun getPlatformVersion(@NonNull call: MethodCall, @NonNull result: Result) {
+        result.success("Android ${android.os.Build.VERSION.RELEASE}")
+    }
+
+    /**
+     * 展示banner广告
+     */
+    private fun showShowBannerAd(@NonNull call: MethodCall, @NonNull result: Result) {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
     }
 
@@ -66,64 +83,55 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 options.data.put("gamerSid", gamerSid)
                 options.data.put("muteVideoSounds", false)
                 options.data.put("videoMuted", false)
-                UnityAds.show(
-                    activity,
-                    adUnitId,
-                    options,
-                    object : IUnityAdsShowListener {
-                        override fun onUnityAdsShowFailure(
-                            placementId: String?,
-                            error: UnityAds.UnityAdsShowError?,
-                            message: String?
-                        ) {
-                            ///进行广告显示 失败
-                            Log.d("ly", "onUnityAdsShowFailure:$message");
+                UnityAds.show(activity, adUnitId, options, object : IUnityAdsShowListener {
+                    override fun onUnityAdsShowFailure(
+                        placementId: String?,
+                        error: UnityAds.UnityAdsShowError?,
+                        message: String?
+                    ) {
+                        ///进行广告显示 失败
+                        Log.d("ly", "onUnityAdsShowFailure:$message");
 
-                        }
+                    }
 
-                        override fun onUnityAdsShowStart(placementId: String?) {
-                            ///进行广告显示 进行中
-                            Log.d("ly", "onUnityAdsShowStart:$placementId");
+                    override fun onUnityAdsShowStart(placementId: String?) {
+                        ///进行广告显示 进行中
+                        Log.d("ly", "onUnityAdsShowStart:$placementId");
 
-                        }
+                    }
 
-                        override fun onUnityAdsShowClick(placementId: String?) {
-                            ///进行广告显示 点击
+                    override fun onUnityAdsShowClick(placementId: String?) {
+                        ///进行广告显示 点击
 
+                        channel.invokeMethod(
+                            "onUnityAdsShowClick", mapOf(
+                                "placementId" to placementId
+                            )
+                        )
+                    }
+
+                    override fun onUnityAdsShowComplete(
+                        placementId: String?, state: UnityAds.UnityAdsShowCompletionState?
+                    ) {
+                        ///进行广告显示 展示完成
+                        Log.d("ly", "onUnityAdsShowComplete:${state?.name}")
+                        if (isRewardAd) {
+                            //如果是奖励广告 需要区分是否观看完毕了
+                            val isWatchCompleted =
+                                state?.equals(UnityAds.UnityAdsShowCompletionState.COMPLETED)
                             channel.invokeMethod(
-                                "onUnityAdsShowClick",
-                                mapOf(
-                                    "placementId" to placementId
+                                "onUnityAdsShowComplete", mapOf(
+                                    "placementId" to placementId,
+                                    "isWatchCompleted" to isWatchCompleted,
                                 )
                             )
                         }
-
-                        override fun onUnityAdsShowComplete(
-                            placementId: String?,
-                            state: UnityAds.UnityAdsShowCompletionState?
-                        ) {
-                            ///进行广告显示 展示完成
-                            Log.d("ly", "onUnityAdsShowComplete:${state?.name}")
-                            if (isRewardAd) {
-                                //如果是奖励广告 需要区分是否观看完毕了
-                                val isWatchCompleted =
-                                    state?.equals(UnityAds.UnityAdsShowCompletionState.COMPLETED)
-                                channel.invokeMethod(
-                                    "onUnityAdsShowComplete",
-                                    mapOf(
-                                        "placementId" to placementId,
-                                        "isWatchCompleted" to isWatchCompleted,
-                                    )
-                                )
-                            }
-                        }
-                    })
+                    }
+                })
             }
 
             override fun onUnityAdsFailedToLoad(
-                placementId: String?,
-                error: UnityAds.UnityAdsLoadError?,
-                message: String?
+                placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?
             ) {
                 // 广告加载失败
                 result.success("onUnityAdsFailedToLoad:$message")
@@ -141,8 +149,7 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 //        'init', {"gameId": gameId,"ifTestModel":ifTestModel
         val gameId = (call.argument("gameId") as? String)
         val ifTestModel = (call.argument("ifTestModel") as? Boolean)
-        UnityAds.initialize(
-            context,
+        UnityAds.initialize(context,
             gameId,
             ifTestModel == false,
             object : IUnityAdsInitializationListener {
@@ -151,8 +158,7 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 }
 
                 override fun onInitializationFailed(
-                    error: UnityAds.UnityAdsInitializationError?,
-                    message: String?
+                    error: UnityAds.UnityAdsInitializationError?, message: String?
                 ) {
                     result.success(message)
 
@@ -168,6 +174,7 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
+        lyBannerAdViewFactory.setActivity(activity)
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
