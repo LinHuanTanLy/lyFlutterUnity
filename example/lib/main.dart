@@ -29,8 +29,16 @@ class _MyAppState extends State<MyApp> {
 
   void initCallback() {
     _lyUnityAdPlugin.setCallBack((call) {
+      debugPrint("${call.method}------${call.arguments}");
       switch (call.method) {
+        case "onUnityAdsShowClick":
 
+          ///点击<去下载>
+          break;
+        case "onUnityAdsShowComplete":
+
+          ///激励视频，是否观看完毕
+          break;
       }
       return Future.value(true);
     });
@@ -83,6 +91,14 @@ class _MyAppState extends State<MyApp> {
                     .then((value) => debugPrint('ly say: $value'));
               },
               child: const Text("showInterstitialAd"),
+            ),
+            MaterialButton(
+              onPressed: () {
+                _lyUnityAdPlugin
+                    .showRewardedAd("lyRewardAd", "ly0001")
+                    .then((value) => debugPrint('ly say: $value'));
+              },
+              child: const Text("showRewardedAd"),
             ),
           ],
         ),

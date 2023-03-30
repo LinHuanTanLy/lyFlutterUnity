@@ -34,4 +34,11 @@ class MethodChannelLyUnityAd extends LyUnityAdPlatform {
         'showInterstitialAd', {"adUnitId": adUnitId, "gamerSid": gamerSid});
     return result;
   }
+
+  @override
+  Future<String?> showRewardedAd(adUnitId, gamerSid) async {
+    final result = await methodChannel.invokeMethod<String>(
+        'showRewardedAd', {"adUnitId": adUnitId, "gamerSid": gamerSid});
+    return result;
+  }
 }

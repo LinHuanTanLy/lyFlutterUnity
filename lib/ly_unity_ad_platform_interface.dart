@@ -24,10 +24,10 @@ abstract class LyUnityAdPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  void setCallBack(Future<dynamic> Function(MethodCall call)? handler){
+  void setCallBack(Future<dynamic> Function(MethodCall call)? handler) {
     throw UnimplementedError('setCallBack() has not been implemented.');
-
   }
+
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
@@ -36,7 +36,11 @@ abstract class LyUnityAdPlatform extends PlatformInterface {
     throw UnimplementedError('init() has not been implemented.');
   }
 
-  Future<String?> showInterstitialAd(adUnitId,gamerSid) {
+  Future<String?> showInterstitialAd(adUnitId, gamerSid) {
     throw UnimplementedError('showInterstitialAd() has not been implemented.');
+  }
+
+  Future<String?> showRewardedAd(adUnitId, gamerSid) {
+    throw UnimplementedError('showRewardedAd() has not been implemented.');
   }
 }

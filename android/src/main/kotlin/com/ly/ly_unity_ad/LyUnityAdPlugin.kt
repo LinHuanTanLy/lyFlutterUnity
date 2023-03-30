@@ -12,7 +12,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
-import com.unity3d.services.core.properties.ClientProperties.getApplicationContext
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
@@ -32,7 +31,8 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         when (call.method) {
             "getPlatformVersion" -> getPlatformVersion(call, result)
             "init" -> init(call, result)
-            "showInterstitialAd" -> showInterstitialAd(call, result)
+            "showInterstitialAd" -> showAds(call, result, false)
+            "showRewardedAd" -> showAds(call, result, true)
         }
 
 
@@ -45,7 +45,13 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")
     }
 
-    private fun showInterstitialAd(@NonNull call: MethodCall, @NonNull result: Result) {
+
+    /**
+     * 展示基本视频
+     * 包含基本广告和激励广告
+     * @param isRewardAd 是否是奖励广告
+     */
+    private fun showAds(@NonNull call: MethodCall, @NonNull result: Result, isRewardAd: Boolean) {
         val adUnitId = (call.argument("adUnitId") as? String)
         val gamerSid = (call.argument("gamerSid") as? String)
 
@@ -97,7 +103,19 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                             state: UnityAds.UnityAdsShowCompletionState?
                         ) {
                             ///进行广告显示 展示完成
-                            Log.d("ly", "onUnityAdsShowComplete:${state?.name}");
+                            Log.d("ly", "onUnityAdsShowComplete:${state?.name}")
+                            if (isRewardAd) {
+                                //如果是奖励广告 需要区分是否观看完毕了
+                                val isWatchCompleted =
+                                    state?.equals(UnityAds.UnityAdsShowCompletionState.COMPLETED)
+                                channel.invokeMethod(
+                                    "onUnityAdsShowComplete",
+                                    mapOf(
+                                        "placementId" to placementId,
+                                        "isWatchCompleted" to isWatchCompleted,
+                                    )
+                                )
+                            }
                         }
                     })
             }

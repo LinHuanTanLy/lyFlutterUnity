@@ -15,7 +15,11 @@ class LyUnityAd {
     return LyUnityAdPlatform.instance.init(gameId, ifTestModel);
   }
 
-  Future<String?> showInterstitialAd(String adUnitId,String gamerSid) {
-    return LyUnityAdPlatform.instance.showInterstitialAd(adUnitId,gamerSid);
+  Future<String?> showInterstitialAd(String adUnitId, String gamerSid) {
+    return LyUnityAdPlatform.instance.showInterstitialAd(adUnitId, gamerSid);
+  }
+
+  Future<String?> showRewardedAd(adUnitId, gamerSid) async {
+    return LyUnityAdPlatform.instance.showRewardedAd(adUnitId, gamerSid);
   }
 }
