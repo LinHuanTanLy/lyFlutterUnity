@@ -3,8 +3,6 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'unity_ad_method_channel.dart';
 
-
-
 abstract class LyUnityAdPlatform extends PlatformInterface {
   /// Constructs a LyUnityAdPlatform.
   LyUnityAdPlatform() : super(token: _token);
@@ -44,5 +42,9 @@ abstract class LyUnityAdPlatform extends PlatformInterface {
 
   Future<String?> showRewardedAd(adUnitId, gamerSid) {
     throw UnimplementedError('showRewardedAd() has not been implemented.');
+  }
+
+  Future<bool?> initBannerAd(adUnitId, int width, int height) {
+    throw UnimplementedError('initBannerAd() has not been implemented.');
   }
 }

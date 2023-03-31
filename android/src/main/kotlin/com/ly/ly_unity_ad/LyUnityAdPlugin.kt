@@ -22,16 +22,13 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
 
     private lateinit var lyBannerAdViewFactory: LyBannerAdViewFactory
+
+    private lateinit var flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        this.flutterPluginBinding = flutterPluginBinding
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ly_unity_ad")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
-        lyBannerAdViewFactory = LyBannerAdViewFactory(flutterPluginBinding.binaryMessenger)
-
-        flutterPluginBinding.platformViewRegistry.registerViewFactory(
-                "ly_Android_banner",
-                lyBannerAdViewFactory
-            )
 
     }
 
@@ -43,9 +40,37 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "showInterstitialAd" -> showAds(call, result, false)
             "showRewardedAd" -> showAds(call, result, true)
             "showBannerAd" -> showShowBannerAd(call, result)
+            "initBannerAd" -> initBannerAd(call, result)
         }
 
 
+    }
+
+    /**
+     * 初始化banner
+     */
+    private fun initBannerAd(@NonNull call: MethodCall, @NonNull result: Result) {
+        ///  {"adUnitId": adUnitId, "width": width, "height": height});
+        val adUnitId = (call.argument("adUnitId") as? String)
+        var width = (call.argument("width") as? Int)
+        var height = (call.argument("height") as? Int)
+
+        if (width == null) width = 750
+        if (height == null) height = 750
+
+
+        lyBannerAdViewFactory = LyBannerAdViewFactory(
+            flutterPluginBinding.binaryMessenger,
+            width = width,
+            height = height,
+            adUnitId = adUnitId
+        )
+        lyBannerAdViewFactory.setActivity(activity)
+        val register = flutterPluginBinding.platformViewRegistry.registerViewFactory(
+            "ly_Android_banner",
+            lyBannerAdViewFactory
+        )
+        result.success(register)
     }
 
     /**
@@ -174,7 +199,7 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
-        lyBannerAdViewFactory.setActivity(activity)
+
     }
 
     override fun onDetachedFromActivityForConfigChanges() {

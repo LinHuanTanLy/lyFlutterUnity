@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:ly_unity_ad_example/banner_ad_example.dart';
 import 'package:ly_unity_ad_example/conf.dart';
 import 'package:ly_unity_ad/ly_unity_ad.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -78,7 +80,7 @@ class _MyAppState extends State<MyApp> {
             MaterialButton(
               onPressed: () {
                 _lyUnityAdPlugin
-                    .init(Conf.androidId, true)
+                    .init(Conf.androidId, false)
                     .then((value) => debugPrint(value));
               },
               child: const Text("init"),
@@ -99,16 +101,21 @@ class _MyAppState extends State<MyApp> {
               },
               child: const Text("showRewardedAd"),
             ),
-            MaterialButton(
-              onPressed: () {
-                _lyUnityAdPlugin
-                    .showRewardedAd("lyRewardAd", "ly0001")
-                    .then((value) => debugPrint('ly say: $value'));
-              },
-              child: const Text("lyTestBanner"),
-            ),
-            SizedBox(width: 100,height: 100,  child: const LyBannerAdWidget())
-
+            Builder(builder: (context) {
+              return MaterialButton(
+                onPressed: () {
+                  _lyUnityAdPlugin
+                      .initBannerAd("lyTestBanner", 750, 100)
+                      .then((value) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => const BannerAdExample()));
+                  });
+                },
+                child: const Text("lyTestBanner"),
+              );
+            }),
           ],
         ),
       ),
