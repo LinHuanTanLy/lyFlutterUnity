@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
+import com.ly.ly_unity_ad.callback.LyUnityCallback
 import com.ly.ly_unity_ad.widget.LyBannerAdViewFactory
 import com.unity3d.ads.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -63,7 +64,16 @@ class LyUnityAdPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             flutterPluginBinding.binaryMessenger,
             width = width,
             height = height,
-            adUnitId = adUnitId
+            adUnitId = adUnitId,
+            lyUnityCallback = object : LyUnityCallback {
+                override fun onClicked(placementId: String?) {
+                    channel.invokeMethod(
+                        "onBannerClick", mapOf(
+                            "placementId" to placementId
+                        )
+                    )
+                }
+            }
         )
         lyBannerAdViewFactory.setActivity(activity)
         val register = flutterPluginBinding.platformViewRegistry.registerViewFactory(

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.ly.ly_unity_ad.callback.LyUnityCallback
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
 import com.unity3d.services.banners.UnityBannerSize
@@ -19,7 +20,8 @@ class LyBannerAdViewFactory(
     private val messenger: BinaryMessenger?,
     private val height: Int,
     private val width: Int,
-    private val adUnitId: String?
+    private val adUnitId: String?,
+    private val lyUnityCallback: LyUnityCallback
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     private var activity: Activity? = null
     fun setActivity(activity: Activity?) {
@@ -27,14 +29,15 @@ class LyBannerAdViewFactory(
     }
 
     override fun create(context: Context?, viewId: Int, args: Any?): PlatformView {
-        return LyBannerAdView(activity, height = height, width = width, adUnitId = adUnitId)
+        return LyBannerAdView(activity, height = height, width = width, adUnitId = adUnitId,lyUnityCallback=lyUnityCallback)
     }
 }
 
 class LyBannerAdView(
     activity: Activity?, height: Int,
     width: Int,
-    adUnitId: String?
+    adUnitId: String?,
+    lyUnityCallback: LyUnityCallback
 ) : PlatformView {
     private var topBanner: BannerView? = null
 
@@ -49,6 +52,7 @@ class LyBannerAdView(
 
             override fun onBannerClick(bannerAdView: BannerView?) {
                 Log.d("ly say:", "onBannerClick")
+                lyUnityCallback.onClicked(bannerAdView?.placementId)
             }
 
             override fun onBannerFailedToLoad(

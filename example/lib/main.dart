@@ -40,6 +40,10 @@ class _MyAppState extends State<MyApp> {
 
           ///激励视频，是否观看完毕
           break;
+        case "onBannerClick":
+
+          ///banner广告，点击
+          break;
       }
       return Future.value(true);
     });

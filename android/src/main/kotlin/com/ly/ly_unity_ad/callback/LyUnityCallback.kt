@@ -1,4 +1,6 @@
 package com.ly.ly_unity_ad.callback
 
-class LyUnityCallback {
+interface LyUnityCallback {
+
+    fun onClicked(placementId: String?)
 }
